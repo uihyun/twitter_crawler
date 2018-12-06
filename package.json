@@ -1,0 +1,26 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "crawl web data",
+  "main": "crawler.js",
+  "dependencies": {
+    "dateformat": "^3.0.3",
+    "deasync": "^0.1.13",
+    "selenium-webdriver": "^4.0.0-alpha.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "no test"
+  },
+  "author": "Uihyun Kim",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uihyun/twitter_crawler.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/uihyun/twitter_crawler/issues"
+  },
+  "homepage": "https://github.com/uihyun/twitter_crawler#readme"
+}
