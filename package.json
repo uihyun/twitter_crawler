@@ -4,13 +4,17 @@
   "description": "crawl web data",
   "main": "crawler.js",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "dateformat": "^3.0.3",
     "deasync": "^0.1.13",
+    "readline": "^1.3.0",
+    "request": "^2.88.0",
     "selenium-webdriver": "^4.0.0-alpha.1"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "no test"
+    "test": "no test",
+    "start": "node crawler; node crawler_profile"
   },
   "author": "Uihyun Kim",
   "license": "MIT",
