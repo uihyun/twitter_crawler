@@ -1,9 +1,9 @@
 // configuration
 exports.brand = "samsung"; //lg, whirlpool, ge
-exports.products = "washer";
-// exports.products = "washer,washing machine,laundry,washerdryer";
-exports.sinceDate = "2017-01-01";
+exports.products = "washer,washing machine,washerdryer";
+exports.sinceDate = "2018-12-01";
 exports.untilDate = "2018-12-11";
+exports.beginOffset = 0;
 
 exports.showContents = false;
 exports.header = true;

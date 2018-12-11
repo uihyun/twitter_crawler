@@ -1,6 +1,4 @@
-var request = require('request'),
-    cheerio = require('cheerio'),
-    fs = require('fs'),
+var fs = require('fs'),
     config = require('./config'),
     webdriver = require('selenium-webdriver'),
     dateFormat = require('dateformat'),
@@ -14,16 +12,18 @@ var showContents = config.showContents,
     untilDate = config.untilDate,
     header = config.header,
     withBrand = config.withBrand,
-    withRangeFormat = config.withRangeFormat;
+    withRangeFormat = config.withRangeFormat,
+    count = config.count;
 
-function getArticle(product) {
+function getTweet(query) {
     console.log("### start ###");
     
-    var url;
     if (!withBrand)
-        url = "https://twitter.com/search?q=" + product.replace(' ', '%20') + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&amp;amp;amp;amp;amp;amp;lang=eg";
+        query = query + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&amp;amp;amp;amp;amp;amp;lang=eg";
     else
-        url = "https://twitter.com/search?q=" + brand + "%20" + product.replace(' ', '%20') + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&amp;amp;amp;amp;amp;amp;lang=eg";
+        query = query + "%20" + brand + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&amp;amp;amp;amp;amp;amp;lang=eg";
+    
+    var url = "https://twitter.com/search?q=" + query;
     
     var driver = new webdriver.Builder()
     .forBrowser('chrome')
@@ -45,8 +45,9 @@ function getArticle(product) {
     });
 
     while(!isEnd) {
-        deasync.sleep(10000);
+        deasync.sleep(1000);
     }
+    deasync.sleep(10000);
     isEnd = false;
 
     while(lastHeight != newHeight) {
@@ -61,8 +62,9 @@ function getArticle(product) {
         });
 
         while(!isEnd) {
-            deasync.sleep(10000);
+            deasync.sleep(1000);
         }
+        deasync.sleep(10000);
         isEnd = false;
         
         driver.executeScript('return document.body.scrollHeight')
@@ -76,8 +78,9 @@ function getArticle(product) {
         });
         
         while(!isEnd) {
-            deasync.sleep(10000);
+            deasync.sleep(1000);
         }
+        deasync.sleep(10000);
         isEnd = false;
 
         if (lastHeight == newHeight)
@@ -85,8 +88,9 @@ function getArticle(product) {
     }
 
     while(!isEnd) {
-        deasync.sleep(10000);
+        deasync.sleep(1000);
     }
+    deasync.sleep(10000);
     isEnd = false;
 
     driver.executeScript('return document.body.scrollHeight')
@@ -99,11 +103,11 @@ function getArticle(product) {
     });
     
     while(!isEnd) {
-        deasync.sleep(10000);
+        deasync.sleep(1000);
     }
+    deasync.sleep(10000);
     isEnd = false;
 
-    var count = 0;
     var elements = driver.findElements(By.className('content'));
     elements.then(function (elements) {
         for (var i = 0; i < elements.length; i++) {
@@ -192,11 +196,14 @@ function getArticle(product) {
                     console.log('@@@@@ replyCount ', replyCount);
                     console.log('@@@@@ retweetCount ', retweetCount);
                     console.log('@@@@@ likeCount ', likeCount);
+                    console.log('@@@@@ profileLink ', profileLink);
                 }
 
                 if (withRangeFormat) {
-                    if (replyCount <= 100) {
-                        replyCount = replyCount + '","0~100';
+                    if (replyCount <= 50) {
+                        replyCount = replyCount + '","0~50';
+                    } else if (replyCount <= 100) {
+                        replyCount = replyCount + '","51~100';
                     } else if (replyCount <= 500) {
                         replyCount = replyCount + '","101~500';
                     } else if (replyCount <= 1000) {
@@ -212,11 +219,13 @@ function getArticle(product) {
                     } else if (replyCount > 50000) {
                         replyCount = replyCount + '","50001~';
                     } else {
-                        replyCount = replyCount + '","0~100';
+                        replyCount = replyCount + '","0~50';
                     }
 
-                    if (retweetCount <= 100) {
-                        retweetCount = retweetCount + '","0~100';
+                    if (retweetCount <= 50) {
+                        retweetCount = retweetCount + '","0~50';
+                    } else if (retweetCount <= 100) {
+                        retweetCount = retweetCount + '","51~100';
                     } else if (retweetCount <= 500) {
                         retweetCount = retweetCount + '","101~500';
                     } else if (retweetCount <= 1000) {
@@ -232,11 +241,13 @@ function getArticle(product) {
                     } else if (retweetCount > 50000) {
                         retweetCount = retweetCount + '","50001~';
                     } else {
-                        retweetCount = retweetCount + '","0~100';
+                        retweetCount = retweetCount + '","0~50';
                     }
 
-                    if (likeCount <= 100) {
-                        likeCount = likeCount + '","0~100';
+                    if (likeCount <= 50) {
+                        likeCount = likeCount + '","0~50';
+                    } else if (likeCount <= 100) {
+                        likeCount = likeCount + '","51~100';
                     } else if (likeCount <= 500) {
                         likeCount = likeCount + '","101~500';
                     } else if (likeCount <= 1000) {
@@ -252,23 +263,23 @@ function getArticle(product) {
                     } else if (likeCount > 50000) {
                         likeCount = likeCount + '","50001~';
                     } else {
-                        likeCount = likeCount + '","0~100';
+                        likeCount = likeCount + '","0~50';
                     }
                 }
 
                 var seq = '';
                 if (!withBrand)
-                    seq = product.replace(' ', '_') + '_' + count;
+                    seq = 'washer_' + count;
                 else
-                    seq = brand + '_' + product.replace(' ', '_') + '_' + count;
+                    seq = brand + '_washer_' + count;
                 
                 // write
-                // seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profileLink
+                // seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profilelink
                 if (outputType === 0) {
                     // write json
                     fs.appendFile('sns_twitter.json',  JSON.stringify(post) + ',\n', 'utf-8', function (err) {
                         if (err) throw err;
-                        else console.log("### saved item and reply " + count + " ###");
+                        else console.log("### saved tweet " + count + " ###");
                     });
                 } else if (outputType === 1) {
                     var brandStr = brand.toUpperCase();
@@ -281,13 +292,13 @@ function getArticle(product) {
 
                     // write csv
                     if (!withBrand)
-                        fs.appendFile('sns_twitter_' + sinceDate + '_' + untilDate + '.csv',  '"' + seq + '","' + name + '","' + id + '","' + date +                     
+                        fs.appendFile('sns_twitter_washer.csv',  '"' + seq + '","' + name + '","' + id + '","' + date +                     
                         '","' + body + '","' + replyCount + '","' + retweetCount + '","' + likeCount + '","Twitter","' + profileLink + '"\n', 'utf-8', function (err) {
                             if (err) throw err;
                             else console.log("### saved tweet " + count + " ###");
                         });
                     else
-                        fs.appendFile('sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv',  '"' + seq + '","' + name + '","' + id + '","' + date + 
+                        fs.appendFile('sns_twitter_' + brand + '_washer.csv',  '"' + seq + '","' + name + '","' + id + '","' + date + 
                         '","' + body + '","' + replyCount + '","' + retweetCount + '","' + likeCount + '","' +  brandStr + '","Twitter","' + profileLink + '"\n', function (err) {                        
                             if (err) throw err;
                             else console.log("### saved tweet " + count + " ###");
@@ -315,14 +326,18 @@ if (outputType === 1 && header) {
         else
             columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,brand,site,profilelink\n';
     
-    fs.writeFile('sns_twitter_' + sinceDate + '_' + untilDate + '.csv', columns, 'utf-8', function (err) {            
+    fs.writeFile('sns_twitter_washer.csv', columns, 'utf-8', function (err) {            
         if (err) throw err;
         console.log("### saved header ###");
     });
 }
 
 var productArray = products.split(',');
+var productQuery = '';
 for (var p = 0; p < productArray.length; p++) {
-    getArticle(productArray[p]);
+    productQuery += '"' + productArray[p] + '"'
+    if (p != productArray.length - 1)
+        productQuery += '%20OR%20'
 }
 
+getTweet(productQuery);

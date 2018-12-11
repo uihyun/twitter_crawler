@@ -8,28 +8,30 @@ var request = require('request'),
 var showContents = config.showContents,
     outputType = config.outputType,
     brand = config.brand,
-    sinceDate = config.sinceDate,
-    untilDate = config.untilDate,
     header = config.header,
     withBrand = config.withBrand,
-    withRangeFormat = config.withRangeFormat;
+    withRangeFormat = config.withRangeFormat,
+    beginOffset = config.beginOffset;
 
-var count = 0;
+var count = beginOffset;
 
 function getProfile(line) {
-    console.log("### start ###");
-
     var url = line.substring(line.lastIndexOf('","') + 3, line.length - 1);
-    var tweetData = line.substring(0, line.lastIndexOf('","') + 1);
+    var tweetData = line;
     
     var tweets = '';
     var following = '';
     var followers = '';
     var favorites = '';
 
-    request(url, function (err, res, html) {
-        if (err) return console.error(err);
+    var isError = false;
 
+    request(url, function (err, res, html) {
+        if (err) {
+            isError = true;
+            return console.error(err);
+        }
+        
         var $ = cheerio.load(html);
         $("ul.ProfileNav-list").each(function () {
             var data = $(this);
@@ -49,13 +51,17 @@ function getProfile(line) {
     });
 
     while (true) {
-        if (tweets.length != 0)
+        if (tweets.length != 0 || isError) {
+            isError = false;
             break;
+        }
         else
-            deasync.sleep(1000);
+            deasync.sleep(100);
     }
 
-    if (following.length == 0)
+    if (tweets.length == 0)
+        tweets = 0;
+    else if (following.length == 0)
         following = 0;
     else if (followers.length == 0)
         followers = 0;
@@ -63,8 +69,10 @@ function getProfile(line) {
         favorites = 0;
 
     if (withRangeFormat) {
-        if (tweets <= 100) {
-            tweets = tweets + '","0~100';
+        if (tweets <= 50) {
+            tweets = tweets + '","0~50';
+        } else if (tweets <= 100) {
+            tweets = tweets + '","51~100';
         } else if (tweets <= 500) {
             tweets = tweets + '","101~500';
         } else if (tweets <= 1000) {
@@ -80,11 +88,13 @@ function getProfile(line) {
         } else if (tweets > 50000) {
             tweets = tweets + '","50001~';
         } else {
-            tweets = tweets + '","0~100';
+            tweets = tweets + '","0~50';
         }
 
-        if (following <= 100) {
-            following = following + '","0~100';
+        if (following <= 50) {
+            following = following + '","0~50';
+        } else if (following <= 100) {
+            following = following + '","51~100';
         } else if (following <= 500) {
             following = following + '","101~500';
         } else if (following <= 1000) {
@@ -100,11 +110,13 @@ function getProfile(line) {
         } else if (following > 50000) {
             following = following + '","50001~';
         } else {
-            following = following + '","0~100';
+            following = following + '","0~50';
         }
 
-        if (followers <= 100) {
-            followers = followers + '","0~100';
+        if (followers <= 50) {
+            followers = followers + '","0~50';
+        } else if (followers <= 100) {
+            followers = followers + '","51~100';
         } else if (followers <= 500) {
             followers = followers + '","101~500';
         } else if (followers <= 1000) {
@@ -120,11 +132,13 @@ function getProfile(line) {
         } else if (followers > 50000) {
             followers = followers + '","50001~';
         } else {
-            followers = followers + '","0~100';
+            followers = followers + '","0~50';
         }
 
-        if (favorites <= 100) {
-            favorites = favorites + '","0~100';
+        if (favorites <= 50) {
+            favorites = favorites + '","0~50';
+        } else if (favorites <= 100) {
+            favorites = favorites + '","51~100';
         } else if (favorites <= 500) {
             favorites = favorites + '","101~500';
         } else if (favorites <= 1000) {
@@ -140,7 +154,7 @@ function getProfile(line) {
         } else if (favorites > 50000) {
             favorites = favorites + '","50001~';
         } else {
-            favorites = favorites + '","0~100';
+            favorites = favorites + '","0~50';
         }
     }
 
@@ -149,31 +163,36 @@ function getProfile(line) {
         // write json
         fs.appendFile('store_lowes.json',  JSON.stringify(post) + ',\n', 'utf-8', function (err) {
             if (err) throw err;
-            else console.log("### saved item and reply " + count + " ###");
+            else console.log("### saved profile " + count + " ###");
         });
     } else if (outputType === 1) {
         // write csv
         if (!withBrand)
-            fs.appendFile('sns_twitter_' + sinceDate + '_' + untilDate + '_profile.csv',  tweetData + ',"' + tweets + '","' + following +
+            fs.appendFile('sns_twitter_washer_profile.csv',  tweetData + ',"' + tweets + '","' + following +
             '","' + followers + '","' + favorites + '"\n', 'utf-8', function (err) {
                 if (err) throw err;
-                else console.log("### saved tweet " + count + " ###");
+                else console.log("### saved profile " + count + " ###");
             });
         else
-            fs.appendFile('sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '_profile.csv',  tweetData + ',"' + tweets + '","' + following +
+            fs.appendFile('sns_twitter_' + brand + '_washer_profile.csv',  tweetData + ',"' + tweets + '","' + following +
             '","' + followers + '","' + favorites + '"\n', 'utf-8', function (err) {                        
                 if (err) throw err;
-                else console.log("### saved tweet " + count + " ###");
+                else console.log("### saved profile " + count + " ###");
             });
     }
 
     count++;
 };
 
+var init = false;
+var i = 0;
+
 // read csv
 if (outputType === 1) {
+    console.log("### start ###");
+
     var rd = readline.createInterface({
-        input: fs.createReadStream('sns_twitter_' + sinceDate + '_' + untilDate + '.csv', 'utf-8'),
+        input: fs.createReadStream('sns_twitter_washer.csv', 'utf-8'),
         output: process.stdout,
         console: false
     });
@@ -181,7 +200,7 @@ if (outputType === 1) {
     rd.on('line', function(line) {
         if (showContents)
             console.log(line);
-            
+        
         // write csv header
         if (outputType === 1 && header) {
             var columns = '';
@@ -190,12 +209,21 @@ if (outputType === 1) {
             else
                 columns = line + ',tweets,tweetsrange,following,followingrange,followers,followersrange,favorites,favoritesrange\n';
             
-            fs.writeFile('sns_twitter_' + sinceDate + '_' + untilDate + '_profile.csv', columns, 'utf-8', function (err) {            
+            fs.writeFile('sns_twitter_washer_profile.csv', columns, 'utf-8', function (err) {            
                 if (err) throw err;
                 console.log("### saved header ###");
             });
 
             header = false;
+            init = true;
+            return;
+        } else if (!header && !init) {
+            init = true;
+            return;
+        }
+
+        if (beginOffset > i) {
+            i++;
             return;
         }
 

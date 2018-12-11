@@ -1,7 +1,7 @@
 {
   "name": "crawler",
   "version": "1.0.0",
-  "description": "crawl web data",
+  "description": "crawl twitter data",
   "main": "crawler.js",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
