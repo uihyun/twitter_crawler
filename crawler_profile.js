@@ -8,12 +8,15 @@ var request = require('request'),
 var showContents = config.showContents,
     outputType = config.outputType,
     brand = config.brand,
+    sinceDate = config.sinceDate,
+    untilDate = config.untilDate,
     header = config.header,
     withBrand = config.withBrand,
     withRangeFormat = config.withRangeFormat,
     beginOffset = config.beginOffset;
 
 var count = beginOffset;
+var fileName = '';
 
 function getProfile(line) {
     var url = line.substring(line.lastIndexOf('","') + 3, line.length - 1);
@@ -46,18 +49,25 @@ function getProfile(line) {
                 console.log('@@@@@ following ' + following);
                 console.log('@@@@@ followers ' + followers);
                 console.log('@@@@@ favorites ' + favorites);
-            }
+            }                
+        });
+
+        $("div.flex-module.error-page.clearfix").each(function () {
+            var data = $(this);
+
+            var suspend = data.find("h1").text().trim();
+            if (suspend.indexOf('suspended') > -1 || suspend.indexOf('정지') > -1)
+                isError = true;
         });
     });
 
     while (true) {
-        if (tweets.length != 0 || isError) {
-            isError = false;
+        if (tweets.length != 0 || isError)
             break;
-        }
         else
             deasync.sleep(100);
     }
+    isError = false;
 
     if (tweets.length == 0)
         tweets = 0;
@@ -168,13 +178,13 @@ function getProfile(line) {
     } else if (outputType === 1) {
         // write csv
         if (!withBrand)
-            fs.appendFile('sns_twitter_washer_profile.csv',  tweetData + ',"' + tweets + '","' + following +
+            fs.appendFile(fileName,  tweetData + ',"' + tweets + '","' + following +
             '","' + followers + '","' + favorites + '"\n', 'utf-8', function (err) {
                 if (err) throw err;
                 else console.log("### saved profile " + count + " ###");
             });
         else
-            fs.appendFile('sns_twitter_' + brand + '_washer_profile.csv',  tweetData + ',"' + tweets + '","' + following +
+            fs.appendFile(fileName,  tweetData + ',"' + tweets + '","' + following +
             '","' + followers + '","' + favorites + '"\n', 'utf-8', function (err) {                        
                 if (err) throw err;
                 else console.log("### saved profile " + count + " ###");
@@ -190,13 +200,20 @@ var i = 0;
 // read csv
 if (outputType === 1) {
     console.log("### start ###");
+    
+    if (!withBrand)
+        fileName = 'sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
+    else
+        fileName = 'sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv';
 
     var rd = readline.createInterface({
-        input: fs.createReadStream('sns_twitter_washer.csv', 'utf-8'),
+        input: fs.createReadStream(fileName, 'utf-8'),
         output: process.stdout,
         console: false
     });
     
+    fileName = fileName.substring(0, fileName.length - 4) + '_profile.csv';
+
     rd.on('line', function(line) {
         if (showContents)
             console.log(line);
@@ -209,7 +226,7 @@ if (outputType === 1) {
             else
                 columns = line + ',tweets,tweetsrange,following,followingrange,followers,followersrange,favorites,favoritesrange\n';
             
-            fs.writeFile('sns_twitter_washer_profile.csv', columns, 'utf-8', function (err) {            
+            fs.writeFile(fileName, columns, 'utf-8', function (err) {            
                 if (err) throw err;
                 console.log("### saved header ###");
             });

@@ -13,15 +13,24 @@ var showContents = config.showContents,
     header = config.header,
     withBrand = config.withBrand,
     withRangeFormat = config.withRangeFormat,
-    count = config.count;
+    count = config.beginOffset;
+
+var fileName = '';
 
 function getTweet(query) {
     console.log("### start ###");
     
-    if (!withBrand)
-        query = query + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&amp;amp;amp;amp;amp;amp;lang=eg";
-    else
-        query = query + "%20" + brand + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&amp;amp;amp;amp;amp;amp;lang=eg";
+    if (untilDate != '') {
+        if (!withBrand)
+            query = query + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
+        else
+            query = query + "%20" + brand + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
+    } else {
+        if (!withBrand)
+            query = query + "%20since%3A" + sinceDate + "&l=en&f=tweets";
+        else
+            query = query + "%20" + brand + "%20since%3A" + sinceDate + "&l=en&f=tweets";
+    }
     
     var url = "https://twitter.com/search?q=" + query;
     
@@ -136,10 +145,15 @@ function getTweet(query) {
                 var date = value.substring(0, value.indexOf('\n')).trim();
                 if (date.split(' ').length > 1) {
                     date = date + ' ' + untilDate.substring(0, 4);
+                // } else if (date.endsWith('h') || date.endsWith('m') || date.endsWith('s')) {
                 } else if (date.endsWith('h')) {
                     value = value.substring(value.indexOf('\n') + 1, value.length);
                     // date = value.substring(0, value.indexOf('\n')).trim();
-                    date = untilDate;
+                    var now = new Date();
+                    now.setHours(now.getHours - date.substring(0, date.indexOf('h')));
+                    date = now.getDate();
+                } else {
+                    date = new Date();
                 }
                 date = dateFormat(date, 'isoDate');
                 
@@ -269,9 +283,9 @@ function getTweet(query) {
 
                 var seq = '';
                 if (!withBrand)
-                    seq = 'washer_' + count;
+                    seq = 'washer_' + sinceDate + '_' + count;
                 else
-                    seq = brand + '_washer_' + count;
+                    seq = brand + '_washer_' + sinceDate + '_' + count;
                 
                 // write
                 // seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profilelink
@@ -291,18 +305,11 @@ function getTweet(query) {
                     }
 
                     // write csv
-                    if (!withBrand)
-                        fs.appendFile('sns_twitter_washer.csv',  '"' + seq + '","' + name + '","' + id + '","' + date +                     
-                        '","' + body + '","' + replyCount + '","' + retweetCount + '","' + likeCount + '","Twitter","' + profileLink + '"\n', 'utf-8', function (err) {
-                            if (err) throw err;
-                            else console.log("### saved tweet " + count + " ###");
-                        });
-                    else
-                        fs.appendFile('sns_twitter_' + brand + '_washer.csv',  '"' + seq + '","' + name + '","' + id + '","' + date + 
-                        '","' + body + '","' + replyCount + '","' + retweetCount + '","' + likeCount + '","' +  brandStr + '","Twitter","' + profileLink + '"\n', function (err) {                        
-                            if (err) throw err;
-                            else console.log("### saved tweet " + count + " ###");
-                        });
+                    fs.appendFile(fileName,  '"' + seq + '","' + name + '","' + id + '","' + date +                     
+                    '","' + body + '","' + replyCount + '","' + retweetCount + '","' + likeCount + '","Twitter","' + profileLink + '"\n', 'utf-8', function (err) {
+                        if (err) throw err;
+                        else console.log("### saved tweet " + count + " ###");
+                    });
                 }
 
                 count++;
@@ -315,18 +322,22 @@ function getTweet(query) {
 // write csv header
 if (outputType === 1 && header) {
     var columns = '';
-    if (!withBrand)
+    if (!withBrand) {
+        fileName = 'sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
         if (!withRangeFormat)
             columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,site,profilelink\n';
         else
             columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,site,profilelink\n';
-    else
+    }
+    else {
+        fileName = 'sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv';
         if (!withRangeFormat)
             columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profilelink\n';
         else
             columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,brand,site,profilelink\n';
+    }
     
-    fs.writeFile('sns_twitter_washer.csv', columns, 'utf-8', function (err) {            
+    fs.writeFile(fileName, columns, 'utf-8', function (err) {            
         if (err) throw err;
         console.log("### saved header ###");
     });
