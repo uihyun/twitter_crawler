@@ -17,19 +17,20 @@ var showContents = config.showContents,
 
 var fileName = '';
 
-function getTweet(query) {
+function getTweet(productQuery, brandQuery) {
     console.log("### start ###");
     
+    var query = '';
     if (untilDate != '') {
         if (!withBrand)
-            query = query + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
+            query = productQuery + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
         else
-            query = query + "%20" + brand + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
+            query = productQuery + "%20" + brandQuery + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
     } else {
         if (!withBrand)
-            query = query + "%20since%3A" + sinceDate + "&l=en&f=tweets";
+            query = productQuery + "%20since%3A" + sinceDate + "&l=en&f=tweets";
         else
-            query = query + "%20" + brand + "%20since%3A" + sinceDate + "&l=en&f=tweets";
+            query = productQuery + "%20" + brandQuery + "%20since%3A" + sinceDate + "&l=en&f=tweets";
     }
     
     var url = "https://twitter.com/search?q=" + query;
@@ -351,4 +352,12 @@ for (var p = 0; p < productArray.length; p++) {
         productQuery += '%20OR%20'
 }
 
-getTweet(productQuery);
+var brandArray = brand.split(',');
+var brandQuery = '';
+for (var p = 0; p < brandArray.length; p++) {
+    brandQuery += '"' + brandArray[p] + '"'
+    if (p != brandArray.length - 1)
+        brandQuery += '%20OR%20'
+}
+
+getTweet(productQuery, brandQuery);
