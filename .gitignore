@@ -63,4 +63,4 @@ typings/
 # result file and folder
 *.csv
 twitter/
-
+*.org

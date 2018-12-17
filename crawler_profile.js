@@ -7,7 +7,6 @@ var request = require('request'),
 
 var showContents = config.showContents,
     outputType = config.outputType,
-    brand = config.brand,
     sinceDate = config.sinceDate,
     untilDate = config.untilDate,
     header = config.header,
@@ -232,7 +231,7 @@ if (outputType === 1) {
     if (!withBrand)
         fileName = 'sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
     else
-        fileName = 'sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv';
+        fileName = 'sns_twitter_brand_' + sinceDate + '_' + untilDate + '.csv';
 
     var rd = readline.createInterface({
         input: fs.createReadStream(fileName, 'utf-8'),

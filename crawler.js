@@ -25,12 +25,12 @@ function getTweet(productQuery, brandQuery) {
         if (!withBrand)
             query = productQuery + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
         else
-            query = productQuery + "%20" + brandQuery + "%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
+            query = "(" + productQuery + ")%20(" + brandQuery + ")%20since%3A" + sinceDate + "%20until%3A" + untilDate + "&l=en&f=tweets";
     } else {
         if (!withBrand)
             query = productQuery + "%20since%3A" + sinceDate + "&l=en&f=tweets";
         else
-            query = productQuery + "%20" + brandQuery + "%20since%3A" + sinceDate + "&l=en&f=tweets";
+            query = "(" + productQuery + ")%20(" + brandQuery + ")%20since%3A" + sinceDate + "&l=en&f=tweets";
     }
     
     var url = "https://twitter.com/search?q=" + query;
@@ -282,43 +282,55 @@ function getTweet(productQuery, brandQuery) {
                     }
                 }
 
-                var seq = '';
-                if (!withBrand)
-                    seq = 'washer_' + sinceDate + '_' + count;
-                else
-                    seq = brand + '_washer_' + sinceDate + '_' + count;
+                var seq = 'washer_' + date + '_' + count;
                 
                 // write
-                // seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profilelink
+                // seq,writername,writerid,date,body,replycount,retweetcount,likecount,site,profilelink
                 if (outputType === 0) {
                     // write json
                     fs.appendFile('sns_twitter.json',  JSON.stringify(post) + ',\n', 'utf-8', function (err) {
                         if (err) throw err;
-                        else console.log("### saved tweet " + count + " ###");
+                        else {
+                            console.log("### saved tweet " + count + " ###");
+                            count++;
+                            if (count == elements.length)
+                                driver.quit();
+                        }
                     });
                 } else if (outputType === 1) {
-                    var brandStr = brand.toUpperCase();
-                    if (withBrand) {
-                        if (brand == 'samsung')
-                            brandStr = 'Samsung';
-                        else if (brand == 'whirlpool')
-                            brandStr = 'Whirlpool';
-                    }
-
                     // write csv
                     fs.appendFile(fileName,  '"' + seq + '","' + name + '","' + id + '","' + date +                     
                     '","' + body + '","' + replyCount + '","' + retweetCount + '","' + likeCount + '","Twitter","' + profileLink + '"\n', 'utf-8', function (err) {
                         if (err) throw err;
-                        else console.log("### saved tweet " + count + " ###");
+                        else {
+                            console.log("### saved tweet " + count + " ###");
+                            count++;
+                            if (count == elements.length)
+                                driver.quit();
+                        }
                     });
                 }
-
-                count++;
             });
         }
     });
-    
 };
+
+var productArray = products.split(',');
+var productQuery = '';
+for (var p = 0; p < productArray.length; p++) {
+    productQuery += '"' + productArray[p] + '"'
+    if (p != productArray.length - 1)
+        productQuery += '%20OR%20'
+}
+
+var brandArray = brand.split(',');
+var brandQuery = '';
+for (var p = 0; p < brandArray.length; p++) {
+    brandQuery += '"' + brandArray[p] + '"'
+    if (p != brandArray.length - 1)
+        brandQuery += '%20OR%20'
+}
+brand = 'brand';
 
 // write csv header
 if (outputType === 1 && header) {
@@ -342,22 +354,6 @@ if (outputType === 1 && header) {
         if (err) throw err;
         console.log("### saved header ###");
     });
-}
-
-var productArray = products.split(',');
-var productQuery = '';
-for (var p = 0; p < productArray.length; p++) {
-    productQuery += '"' + productArray[p] + '"'
-    if (p != productArray.length - 1)
-        productQuery += '%20OR%20'
-}
-
-var brandArray = brand.split(',');
-var brandQuery = '';
-for (var p = 0; p < brandArray.length; p++) {
-    brandQuery += '"' + brandArray[p] + '"'
-    if (p != brandArray.length - 1)
-        brandQuery += '%20OR%20'
 }
 
 getTweet(productQuery, brandQuery);
