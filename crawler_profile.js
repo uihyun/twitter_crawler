@@ -20,6 +20,10 @@ var fileName = '';
 
 function getProfile(line) {
     var url = line.substring(line.lastIndexOf('","') + 3, line.length - 1);
+
+    if (url.substring(url.lastIndexOf('/'), url.length).length < 2)
+        return;
+
     var tweetData = line;
     
     var tweets = '';
@@ -57,6 +61,30 @@ function getProfile(line) {
 
             var suspend = data.find("h1").text().trim();
             if (suspend.indexOf('suspended') > -1 || suspend.indexOf('정지') > -1)
+                isError = true;
+        });
+
+        $("div.errorpage-body-content").each(function () {
+            var data = $(this);
+
+            var suspend = data.find("h1").text().trim();
+            if (suspend.indexOf('Sorry') > -1 || suspend.indexOf('죄송') > -1)
+                isError = true;
+        });
+
+        $("div.signin-wrapper").each(function () {
+            var data = $(this);
+
+            var suspend = data.find("h1").text().trim();
+            if (suspend.indexOf('Log') > -1 || suspend.indexOf('로그인') > -1)
+                isError = true;
+        });
+
+        $("h3.ProfilePage-emptyModuleHeader").each(function () {
+            var data = $(this);
+
+            var suspend = data.text().trim();
+            if (suspend.indexOf('Tweeted') > -1 || suspend.indexOf('트윗') > -1)
                 isError = true;
         });
     });
