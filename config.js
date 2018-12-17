@@ -1,5 +1,5 @@
 // configuration
-exports.brand = "samsung"; //lg, whirlpool, ge
+exports.brand = "samsung,lg,whirlpool,ge"
 exports.products = "washer,washing machine,washerdryer";
 exports.sinceDate = "2018-11-19";
 exports.untilDate = "2018-11-20"; // not included
