@@ -1,8 +1,8 @@
 // configuration
 exports.brand = "samsung,lg,whirlpool,ge"
 exports.products = "washer,washing machine,washerdryer";
-exports.sinceDate = "2018-12-15"
-exports.untilDate = "2018-12-16"
+exports.sinceDate = "2018-1-1"
+exports.untilDate = "2018-1-2"
 exports.beginOffset = 0;
 
 exports.showContents = false;

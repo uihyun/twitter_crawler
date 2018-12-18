@@ -1,0 +1,11 @@
+for date in {1..29}
+do
+    sed -i '.org' -e "4s/.*/exports.sinceDate = \"2018-9-$((date++))\"/" config.js
+    sed -i '.org' -e "5s/.*/exports.untilDate = \"2018-9-$date\"/" config.js
+    node crawler
+    node crawler_profile
+done
+sed -i '.org' -e "4s/.*/exports.sinceDate = \"2018-9-30\"/" config.js
+sed -i '.org' -e "5s/.*/exports.untilDate = \"2018-10-1\"/" config.js
+node crawler
+node crawler_profile

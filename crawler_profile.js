@@ -229,9 +229,9 @@ if (outputType === 1) {
     console.log("### start ###");
     
     if (!withBrand)
-        fileName = 'sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
+        fileName = 'twitter/sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
     else
-        fileName = 'sns_twitter_brand_' + sinceDate + '_' + untilDate + '.csv';
+        fileName = 'twitter/sns_twitter_brand_' + sinceDate + '_' + untilDate + '.csv';
 
     var rd = readline.createInterface({
         input: fs.createReadStream(fileName, 'utf-8'),

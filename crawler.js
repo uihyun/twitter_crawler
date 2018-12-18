@@ -215,8 +215,16 @@ function getTweet(productQuery, brandQuery) {
                 }
 
                 if (withRangeFormat) {
-                    if (replyCount <= 50) {
-                        replyCount = replyCount + '","0~50';
+                    if (replyCount == 0) {
+                        replyCount = replyCount + '","0';
+                    } else if (replyCount <= 10) {
+                        replyCount = replyCount + '","1~10';
+                    } else if (replyCount <= 20) {
+                        replyCount = replyCount + '","11~20';
+                    } else if (replyCount <= 30) {
+                        replyCount = replyCount + '","21~30';
+                    } else if (replyCount <= 50) {
+                        replyCount = replyCount + '","31~50';
                     } else if (replyCount <= 100) {
                         replyCount = replyCount + '","51~100';
                     } else if (replyCount <= 500) {
@@ -237,8 +245,16 @@ function getTweet(productQuery, brandQuery) {
                         replyCount = replyCount + '","0~50';
                     }
 
-                    if (retweetCount <= 50) {
-                        retweetCount = retweetCount + '","0~50';
+                    if (retweetCount == 0) {
+                        retweetCount = retweetCount + '","0';
+                    } else if (retweetCount <= 10) {
+                        retweetCount = retweetCount + '","1~10';
+                    } else if (retweetCount <= 20) {
+                        retweetCount = retweetCount + '","11~20';
+                    } else if (retweetCount <= 30) {
+                        retweetCount = retweetCount + '","21~30';
+                    } else if (retweetCount <= 50) {
+                        retweetCount = retweetCount + '","31~50';
                     } else if (retweetCount <= 100) {
                         retweetCount = retweetCount + '","51~100';
                     } else if (retweetCount <= 500) {
@@ -259,8 +275,16 @@ function getTweet(productQuery, brandQuery) {
                         retweetCount = retweetCount + '","0~50';
                     }
 
-                    if (likeCount <= 50) {
-                        likeCount = likeCount + '","0~50';
+                    if (likeCount == 0) {
+                        likeCount = likeCount + '","0';
+                    } else if (likeCount <= 10) {
+                        likeCount = likeCount + '","1~10';
+                    } else if (likeCount <= 20) {
+                        likeCount = likeCount + '","11~20';
+                    } else if (likeCount <= 30) {
+                        likeCount = likeCount + '","21~30';
+                    } else if (likeCount <= 50) {
+                        likeCount = likeCount + '","31~50';
                     } else if (likeCount <= 100) {
                         likeCount = likeCount + '","51~100';
                     } else if (likeCount <= 500) {
@@ -332,18 +356,22 @@ for (var p = 0; p < brandArray.length; p++) {
 }
 brand = 'brand';
 
+var dir = 'twitter';
+if (!fs.existsSync(dir))
+    fs.mkdirSync(dir);
+
 // write csv header
 if (outputType === 1 && header) {
     var columns = '';
     if (!withBrand) {
-        fileName = 'sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
+        fileName = 'twitter/sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
         if (!withRangeFormat)
             columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,site,profilelink\n';
         else
             columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,site,profilelink\n';
     }
     else {
-        fileName = 'sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv';
+        fileName = 'twitter/sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv';
         if (!withRangeFormat)
             columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profilelink\n';
         else

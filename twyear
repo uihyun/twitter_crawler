@@ -1,0 +1,56 @@
+year=2018
+for month in {1..12}
+do
+    if [ $month -eq 1 ] || [ $month -eq 3 ] || [ $month -eq 5 ] || [ $month -eq 7 ] || [ $month -eq 8 ] || [ $month -eq 10 ]
+    then
+        for date in {1..30}
+        do
+            sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$month-$((date++))\"/" config.js
+            sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-$date\"/" config.js
+            node crawler
+            node crawler_profile
+        done
+        sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$((month++))-31\"/" config.js
+        sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-1\"/" config.js
+        node crawler
+        node crawler_profile
+    elif [ $month -eq 12 ]
+    then
+        for date in {1..30}
+        do
+            sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$month-$((date++))\"/" config.js
+            sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-$date\"/" config.js
+            node crawler
+            node crawler_profile
+        done
+        sed -i '.org' -e "4s/.*/exports.sinceDate = \"$((year++))-$month-31\"/" config.js
+        sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-1-1\"/" config.js
+        node crawler
+        node crawler_profile
+    elif [ $month -eq 2 ]
+    then
+        for date in {1..27}
+        do
+            sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$month-$((date++))\"/" config.js
+            sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-$date\"/" config.js
+            node crawler
+            node crawler_profile
+        done
+        sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$((month++))-28\"/" config.js
+        sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-1\"/" config.js
+        node crawler
+        node crawler_profile
+    else
+        for date in {1..29}
+        do
+            sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$month-$((date++))\"/" config.js
+            sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-$date\"/" config.js
+            node crawler
+            node crawler_profile
+        done
+        sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$((month++))-30\"/" config.js
+        sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-$month-1\"/" config.js
+        node crawler
+        node crawler_profile
+    fi
+done
