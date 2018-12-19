@@ -34,10 +34,10 @@ function getTweet(productQuery, brandQuery) {
     }
     
     var url = "https://twitter.com/search?q=" + query;
-    
+
     var driver = new webdriver.Builder()
+    // .forBrowser('firefox')
     .forBrowser('chrome')
-    // .setChromeOptions(/* ... */)
     .build();
 
     driver.get(url);
@@ -118,6 +118,16 @@ function getTweet(productQuery, brandQuery) {
     deasync.sleep(10000);
     isEnd = false;
 
+    var noResult = driver.findElements(By.className('SearchEmptyTimeline-emptyTitle'));
+    noResult.then(function (noResult) {
+        if (noResult.length != 0) {
+            console.log('no data');
+            fs.unlinkSync(fileName);
+            driver.quit();
+            return;
+        }
+    });
+
     var elements = driver.findElements(By.className('content'));
     elements.then(function (elements) {
         for (var i = 0; i < elements.length; i++) {
@@ -144,17 +154,24 @@ function getTweet(productQuery, brandQuery) {
 
                 value = value.substring(value.indexOf('\n') + 1, value.length);
                 var date = value.substring(0, value.indexOf('\n')).trim();
+                var now = new Date();
                 if (date.split(' ').length > 1) {
-                    date = date + ' ' + untilDate.substring(0, 4);
+                    if (date.indexOf('Dec') > -1 && date.indexOf('31') > -1 && sinceDate.indexOf('-1-1') > -1) {
+                        var tempDate = new Date(sinceDate);
+                        tempDate.setFullYear(tempDate.getFullYear() - 1);
+                        var temp = dateFormat(tempDate, 'isoDate');
+                        date = date + ' ' + temp.substring(0, 4);
+                    }
+                    else
+                        date = date + ' ' + untilDate.substring(0, 4);
                 // } else if (date.endsWith('h') || date.endsWith('m') || date.endsWith('s')) {
                 } else if (date.endsWith('h')) {
                     value = value.substring(value.indexOf('\n') + 1, value.length);
                     // date = value.substring(0, value.indexOf('\n')).trim();
-                    var now = new Date();
                     now.setHours(now.getHours - date.substring(0, date.indexOf('h')));
                     date = now.getDate();
                 } else {
-                    date = new Date();
+                    date = now;
                 }
                 date = dateFormat(date, 'isoDate');
                 
@@ -306,7 +323,7 @@ function getTweet(productQuery, brandQuery) {
                     }
                 }
 
-                var seq = 'washer_' + date + '_' + count;
+                var seq = 'washer_' + sinceDate + '_' + count;
                 
                 // write
                 // seq,writername,writerid,date,body,replycount,retweetcount,likecount,site,profilelink
