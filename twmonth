@@ -1,7 +1,7 @@
-year=2018
-month=10
+year=2017
+month=8
 end=31
-for date in {1..30}
+for date in {24..30}
 do
     echo "### date $year-$month-$date ###"
     sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$month-$((date++))\"/" config.js
@@ -12,6 +12,7 @@ done
 echo "### date $year-$month-$end ###"
 sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$((month++))-$end\"/" config.js
 if [ $month -eq 13 ]
+then
     $((year++))
     sed -i '.org' -e "5s/.*/exports.untilDate = \"$year-1-1\"/" config.js
 else
