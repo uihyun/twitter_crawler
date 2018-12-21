@@ -18,7 +18,7 @@ do
         node crawler_profile
     elif [ $month -eq 12 ]
     then
-        for date in {1..18}
+        for date in {1..31}
         do
             echo "### date $year-$month-$date ###"
             sed -i '.org' -e "4s/.*/exports.sinceDate = \"$year-$month-$((date++))\"/" config.js
