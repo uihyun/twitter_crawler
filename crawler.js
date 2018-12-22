@@ -380,20 +380,16 @@ if (!fs.existsSync(dir))
 // write csv header
 if (outputType === 1 && header) {
     var columns = '';
-    if (!withBrand) {
+    
+    if (!withBrand)
         fileName = 'twitter/sns_twitter_' + sinceDate + '_' + untilDate + '.csv';
-        if (!withRangeFormat)
-            columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,site,profilelink\n';
-        else
-            columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,site,profilelink\n';
-    }
-    else {
+    else
         fileName = 'twitter/sns_twitter_' + brand + '_' + sinceDate + '_' + untilDate + '.csv';
+    
         if (!withRangeFormat)
-            columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,brand,site,profilelink\n';
-        else
-            columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,brand,site,profilelink\n';
-    }
+        columns = 'seq,writername,writerid,date,body,replycount,retweetcount,likecount,site,profilelink\n';
+    else
+        columns = 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,site,profilelink\n';
     
     fs.writeFile(fileName, columns, 'utf-8', function (err) {            
         if (err) throw err;

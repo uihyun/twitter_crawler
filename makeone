@@ -2,13 +2,13 @@ _now=$(date +"%Y%m%d_%H%M%S")
 _folder="profile_$_now"
 _file="sns_twitter_all_$_now.csv"
 mkdir $_folder
-cp twitter/*_profile.csv $_folder/
+cp twitter_2017/*_profile.csv $_folder/
 find ./$_folder -name '*.csv' -exec sed -i '.org' -e '1d' {} \;
 rm $_folder/*.org
 cat $_folder/* > $_folder/$_file
 rm $_folder/*_profile.csv
 find ./$_folder -name '*.csv' -exec sed -i '.org' -e '/^$/d' {} \;
 rm $_folder/*.org
-echo 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,brand,site,profilelink,tweets,tweetsrange,following,followingrange,followers,followersrange,favorites,favoritesrange' | cat - $_folder/$_file > $_file
+echo 'seq,writername,writerid,date,body,replycount,replyrange,retweetcount,retweetrange,likecount,likerange,site,profilelink,tweets,tweetsrange,following,followingrange,followers,followersrange,favorites,favoritesrange' | cat - $_folder/$_file > $_file
 rm -rf $_folder/
 echo "$_file"
