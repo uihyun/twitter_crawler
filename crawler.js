@@ -231,6 +231,13 @@ function getTweet(productQuery, brandQuery) {
                     console.log('@@@@@ profileLink ', profileLink);
                 }
 
+                if (replyCount.endsWith('K'))
+                    replyCount = replyCount.substring(0, replyCount.length - 1)*1000;
+                if (retweetCount.endsWith('K'))
+                    retweetCount = retweetCount.substring(0, retweetCount.length - 1)*1000;
+                if (likeCount.endsWith('K'))
+                    likeCount = likeCount.substring(0, likeCount.length - 1)*1000;
+
                 if (withRangeFormat) {
                     if (replyCount == 0) {
                         replyCount = replyCount + '","0';
@@ -259,7 +266,7 @@ function getTweet(productQuery, brandQuery) {
                     } else if (replyCount > 50000) {
                         replyCount = replyCount + '","50001~';
                     } else {
-                        replyCount = replyCount + '","0~50';
+                        replyCount = replyCount + '","0';
                     }
 
                     if (retweetCount == 0) {
@@ -289,7 +296,7 @@ function getTweet(productQuery, brandQuery) {
                     } else if (retweetCount > 50000) {
                         retweetCount = retweetCount + '","50001~';
                     } else {
-                        retweetCount = retweetCount + '","0~50';
+                        retweetCount = retweetCount + '","0';
                     }
 
                     if (likeCount == 0) {
@@ -319,7 +326,7 @@ function getTweet(productQuery, brandQuery) {
                     } else if (likeCount > 50000) {
                         likeCount = likeCount + '","50001~';
                     } else {
-                        likeCount = likeCount + '","0~50';
+                        likeCount = likeCount + '","0';
                     }
                 }
 
